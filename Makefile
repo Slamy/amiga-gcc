@@ -25,24 +25,6 @@ BINUTILS_BRANCH := amiga
 GCC_BRANCH := gcc-6-branch
 NEWLIB_BRANCH := amiga
 
-GIT_AMIGA_NETINCLUDE := https://github.com/bebbo/amiga-netinclude
-GIT_BINUTILS         := https://github.com/bebbo/binutils-gdb
-GIT_CLIB2            := https://github.com/bebbo/clib2
-GIT_FD2PRAGMA        := https://github.com/bebbo/fd2pragma
-GIT_FD2SFD           := https://github.com/cahirwpz/fd2sfd
-GIT_GCC              := https://github.com/bebbo/gcc
-GIT_IRA              := https://github.com/bebbo/ira
-GIT_IXEMUL           := https://github.com/bebbo/ixemul
-GIT_LHA              := https://github.com/jca02266/lha
-GIT_LIBDEBUG         := https://github.com/bebbo/libdebug
-GIT_LIBNIX           := https://github.com/bebbo/libnix
-GIT_LIBSDL12         := https://github.com/AmigaPorts/libSDL12
-GIT_NEWLIB_CYGWIN    := https://github.com/bebbo/newlib-cygwin
-GIT_SFDC             := https://github.com/adtools/sfdc
-GIT_VASM             := https://github.com/leffmann/vasm
-GIT_VBCC             := https://github.com/bebbo/vbcc
-GIT_VLINK            := https://github.com/leffmann/vlink
-GIT_AROSSTUFF        := https://github.com/bebbo/aros-stuff
 
 CFLAGS ?= -Os
 CXXFLAGS ?= $(CFLAGS)
@@ -98,12 +80,6 @@ L1 = ;
 L2 = ;
 endif
 
-UPDATE = __x=
-ANDPULL = ;__y=$$(git branch | grep '*' | cut -b3-);echo setting remote origin from $$(git remote get-url origin) to $$__x using branch $$__y;\
-	git remote remove origin; \
-	git remote add origin $$__x; \
-	git remote set-branches origin $$__y;\
-	git pull
 
 # =================================================
 
@@ -232,62 +208,11 @@ clean-prefix:
 # update all projects
 # =================================================
 
-.PHONY: update update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-libpthread update-ndk update-newlib update-netinclude
-update: update-gcc update-binutils update-fd2sfd update-fd2pragma update-ira update-sfdc update-vasm update-vbcc update-vlink update-libnix update-ixemul update-clib2 update-libdebug update-libSDL12 update-libpthread update-ndk update-newlib update-netinclude
-
-update-gcc: projects/gcc/configure
-	@cd projects/gcc && git pull || (export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done)
-
-update-binutils: projects/binutils/configure
-	@cd projects/binutils && git pull || (export DEPTH=16; while true; do echo "trying depth=$$DEPTH"; git pull --depth $$DEPTH && break; export DEPTH=$$(($$DEPTH+$$DEPTH));done)
-
-update-fd2sfd: projects/fd2sfd/configure
-	@cd projects/fd2sfd && git pull
-
-update-fd2pragma: projects/fd2pragma/makefile
-	@cd projects/fd2pragma && git pull
-
-update-ira: projects/ira/Makefile
-	@cd projects/ira && git pull
-
-update-sfdc: projects/sfdc/configure
-	@cd projects/sfdc && git pull
-
-update-vasm: projects/vasm/Makefile
-	@cd projects/vasm && git pull
-
-update-vbcc: projects/vbcc/Makefile
-	@cd projects/vbcc && git pull
-
-update-vlink: projects/vlink/Makefile
-	@cd projects/vlink && git pull
-
-update-libnix: projects/libnix/Makefile.gcc6
-	@cd projects/libnix && git pull
-
-update-ixemul: projects/ixemul/configure
-	@cd projects/ixemul && git pull
-
-update-clib2: projects/clib2/LICENSE
-	@cd projects/clib2 && git pull
-
-update-libdebug: projects/libdebug/configure
-	@cd projects/libdebug && git pull
-
-update-libSDL12: projects/libSDL12/Makefile
-	@cd projects/libSDL12 && git pull
-
-update-libpthread: projects/aros-stuff/pthreads/Makefile
-	@cd projects/aros-stuff && git pull
+.PHONY: update update-libpthread update-ndk update-newlib update-netinclude
+update:  update-libpthread update-ndk
 
 update-ndk: download/NDK39.lha
 	make projects/NDK_3.9.info
-
-update-newlib: projects/newlib-cygwin/newlib/configure
-	@cd projects/newlib-cygwin && git pull
-
-update-netinclude: projects/amiga-netinclude/README.md
-	@cd projects/amiga-netinclude && git pull
 
 update-gmp:
 	if [ -a download/$(GMPFILE) ]; \
@@ -347,9 +272,6 @@ $(BUILD)/binutils/Makefile: projects/binutils/configure
 	@mkdir -p $(BUILD)/binutils
 	$(L0)"configure binutils"$(L1) cd $(BUILD)/binutils && $(E) $(PWD)/projects/binutils/configure $(CONFIG_BINUTILS) $(L2)
 
-
-projects/binutils/configure:
-	@cd projects &&	git clone -b $(BINUTILS_BRANCH) --depth 16 $(GIT_BINUTILS) binutils
 
 # =================================================
 # gdb
@@ -421,8 +343,6 @@ ifneq ($(OWNGMP),)
 endif
 	$(L0)"configure gcc"$(L1) cd $(BUILD)/gcc && $(E) $(PWD)/projects/gcc/configure $(CONFIG_GCC) $(L2)
 
-projects/gcc/configure:
-	@cd projects &&	git clone -b $(GCC_BRANCH) --depth 16 $(GIT_GCC)
 
 # =================================================
 # fd2sfd
@@ -444,7 +364,6 @@ $(BUILD)/fd2sfd/Makefile: projects/fd2sfd/configure
 	$(L0)"configure fd2sfd"$(L1) cd $(BUILD)/fd2sfd && $(E) $(PWD)/projects/fd2sfd/configure $(CONFIG_FD2SFD) $(L2)
 
 projects/fd2sfd/configure:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_FD2SFD)
 	for i in $$(find patches/fd2sfd/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
 		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; fi ; done
@@ -465,8 +384,6 @@ $(BUILD)/fd2pragma/fd2pragma: projects/fd2pragma/makefile $(shell find 2>/dev/nu
 	@mkdir -p $(BUILD)/fd2pragma
 	$(L0)"make fd2sfd"$(L1) cd projects/fd2pragma && $(CC) -o $(PWD)/$@ $(CFLAGS) fd2pragma.c $(L2)
 
-projects/fd2pragma/makefile:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_FD2PRAGMA)
 
 # =================================================
 # ira
@@ -484,8 +401,6 @@ $(BUILD)/ira/ira: projects/ira/Makefile $(shell find 2>/dev/null projects/ira -n
 	@mkdir -p $(BUILD)/ira
 	$(L0)"make ira"$(L1) cd projects/ira && $(CC) -o $(PWD)/$@ $(CFLAGS) *.c -std=c99 $(L2)
 
-projects/ira/Makefile:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_IRA)
 
 # =================================================
 # sfdc
@@ -507,7 +422,6 @@ $(BUILD)/sfdc/Makefile: projects/sfdc/configure
 	$(L0)"configure sfdc"$(L1) cd $(BUILD)/sfdc && $(E) $(PWD)/$(BUILD)/sfdc/configure $(CONFIG_SFDC) $(L2)
 
 projects/sfdc/configure:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_SFDC)
 	for i in $$(find patches/sfdc/ -type f); \
 	do if [[ "$$i" == *.diff ]] ; \
 		then j=$${i:8}; patch -N "projects/$${j%.diff}" "$$i"; fi ; done
@@ -530,9 +444,6 @@ $(BUILD)/vasm/_done: $(BUILD)/vasm/Makefile
 $(BUILD)/vasm/Makefile: projects/vasm/Makefile $(shell find 2>/dev/null projects/vasm -not \( -path projects/vasm/.git -prune \) -type f)
 	@rsync -a projects/vasm $(BUILD)/ --exclude .git
 	@touch $(BUILD)/vasm/Makefile
-
-projects/vasm/Makefile:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_VASM)
 
 # =================================================
 # vbcc
@@ -557,9 +468,6 @@ $(BUILD)/vbcc/Makefile: projects/vbcc/Makefile $(shell find 2>/dev/null projects
 	@mkdir -p $(BUILD)/vbcc/bin
 	@touch $(BUILD)/vbcc/Makefile
 
-projects/vbcc/Makefile:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_VBCC)
-
 # =================================================
 # vlink
 # =================================================
@@ -576,9 +484,6 @@ $(BUILD)/vlink/_done: $(BUILD)/vlink/Makefile $(shell find 2>/dev/null projects/
 
 $(BUILD)/vlink/Makefile: projects/vlink/Makefile
 	@rsync -a projects/vlink $(BUILD)/ --exclude .git
-
-projects/vlink/Makefile:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_VLINK)
 
 .PHONY: lha
 lha: $(BUILD)/_lha_done
@@ -737,8 +642,6 @@ $(BUILD)/_netinclude: projects/amiga-netinclude/README.md $(BUILD)/ndk-include_n
 	@rsync -a $(PWD)/projects/amiga-netinclude/include/* $(PREFIX)/m68k-amigaos/ndk-include
 	@echo "done" >$@
 
-projects/amiga-netinclude/README.md:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_AMIGA_NETINCLUDE)
 
 # =================================================
 # libamiga
@@ -770,8 +673,6 @@ $(BUILD)/libnix/_done: $(BUILD)/newlib/_done $(BUILD)/ndk-include_ndk $(BUILD)/n
 	@rsync --delete -a projects/libnix/sources/headers/* $(PREFIX)/m68k-amigaos/libnix/include/
 	@echo "done" >$@
 
-projects/libnix/Makefile.gcc6:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_LIBNIX)
 
 # =================================================
 # gcc libs
@@ -802,8 +703,6 @@ $(BUILD)/clib2/_done: projects/clib2/LICENSE $(shell find 2>/dev/null projects/c
 	@rsync -a $(BUILD)/clib2/lib $(PREFIX)/m68k-amigaos/clib2
 	@echo "done" >$@
 
-projects/clib2/LICENSE:
-	@cd projects && git clone -b master --depth 4 $(GIT_CLIB2)
 
 # =================================================
 # libdebug
@@ -822,7 +721,6 @@ $(BUILD)/libdebug/Makefile: $(BUILD)/libnix/_done projects/libdebug/configure $(
 	$(L0)"configure libdebug"$(L1) cd $(BUILD)/libdebug && LD=m68k-amigaos-ld CC=m68k-amigaos-gcc CFLAGS="$(CFLAGS_FOR_TARGET)" $(PWD)/projects/libdebug/configure $(CONFIG_LIBDEBUG) $(L2)
 
 projects/libdebug/configure:
-	@cd projects &&	git clone -b master --depth 4 $(GIT_LIBDEBUG)
 	@touch -t 0001010000 projects/libdebug/configure.ac
 
 # =================================================
@@ -849,10 +747,6 @@ $(BUILD)/libSDL12/Makefile: $(BUILD)/libnix/_done projects/libSDL12/Makefile $(s
 	@rsync -a projects/libSDL12/* $(BUILD)/libSDL12
 	@touch $(BUILD)/libSDL12/Makefile
 
-projects/libSDL12/Makefile:
-	@cd projects &&	git clone -b master --depth 4  $(GIT_LIBSDL12)
-
-
 # =================================================
 # libpthread
 # =================================================
@@ -869,9 +763,6 @@ $(BUILD)/libpthread/Makefile: $(BUILD)/libnix/_done projects/aros-stuff/pthreads
 	@mkdir -p $(BUILD)/libpthread
 	@rsync -a projects/aros-stuff/pthreads/* $(BUILD)/libpthread
 	@touch $(BUILD)/libpthread/Makefile
-
-projects/aros-stuff/pthreads/Makefile:
-	@cd projects &&	git clone -b master --depth 4  $(GIT_AROSSTUFF)
 
 # =================================================
 # newlib
@@ -897,14 +788,10 @@ $(BUILD)/newlib/newlib/Makefile: projects/newlib-cygwin/newlib/configure $(BUILD
 	@mkdir -p $(BUILD)/newlib/newlib
 	$(L0)"configure newlib"$(L1) cd $(BUILD)/newlib/newlib && $(NEWLIB_CONFIG) CFLAGS="$(CFLAGS_FOR_TARGET)" CXXFLAGS="$(CXXFLAGS_FOR_TARGET)" $(PWD)/projects/newlib-cygwin/newlib/configure --host=m68k-amigaos --prefix=$(PREFIX) --enable-newlib-io-long-long --enable-newlib-io-c99-formats --enable-newlib-reent-small --enable-newlib-mb $(L2)
 
-projects/newlib-cygwin/newlib/configure:
-	@cd projects &&	git clone -b $(NEWLIB_BRANCH) --depth 4  $(GIT_NEWLIB_CYGWIN)
-
 # =================================================
 # ixemul
 # =================================================
-projects/ixemul/configure:
-	@cd projects &&	git clone $(GIT_IXEMUL)
+
 
 # =================================================
 # sdk installation
@@ -926,23 +813,9 @@ $(SDKS): libnix
 # =================================================
 .PHONY: update-repos
 update-repos:
-	@cd projects/amiga-netinclude && $(UPDATE)$(GIT_AMIGA_NETINCLUDE)$(ANDPULL)
-	@cd projects/binutils         && $(UPDATE)$(GIT_BINUTILS)$(ANDPULL)
-	@cd projects/clib2            && $(UPDATE)$(GIT_CLIB2)$(ANDPULL)
-	@cd projects/fd2pragma        && $(UPDATE)$(GIT_FD2PRAGMA)$(ANDPULL)
-	@cd projects/fd2sfd           && $(UPDATE)$(GIT_FD2SFD)$(ANDPULL)
-	@cd projects/gcc              && $(UPDATE)$(GIT_GCC)$(ANDPULL)
-	@cd projects/ira              && $(UPDATE)$(GIT_IRA)$(ANDPULL)
-	@cd projects/ixemul           && $(UPDATE)$(GIT_IXEMUL)$(ANDPULL)
-#	@cd projects/lha              && $(UPDATE)$(GIT_LHA)$(ANDPULL)
-	@cd projects/libdebug         && $(UPDATE)$(GIT_LIBDEBUG)$(ANDPULL)
-	@cd projects/libnix           && $(UPDATE)$(GIT_LIBNIX)$(ANDPULL)
-	@cd projects/libSDL12         && $(UPDATE)$(GIT_LIBSDL12)$(ANDPULL)
-	@cd projects/newlib-cygwin    && $(UPDATE)$(GIT_NEWLIB_CYGWIN)$(ANDPULL)
-	@cd projects/sfdc             && $(UPDATE)$(GIT_SFDC)$(ANDPULL)
-	@cd projects/vasm             && $(UPDATE)$(GIT_VASM)$(ANDPULL)
-	@cd projects/vbcc             && $(UPDATE)$(GIT_VBCC)$(ANDPULL)
-	@cd projects/vlink            && $(UPDATE)$(GIT_VLINK)$(ANDPULL)
+	git submodule init
+	git submodule sync
+	git submodule update --depth 10
 
 
 # =================================================

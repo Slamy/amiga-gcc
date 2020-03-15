@@ -1,0 +1,51 @@
+[submodule "projects/amiga-netinclude"]
+	path = projects/amiga-netinclude
+	url = https://github.com/bebbo/amiga-netinclude
+[submodule "projects/clib2"]
+	path = projects/clib2
+	url = https://github.com/bebbo/clib2
+[submodule "projects/fd2pragma"]
+	path = projects/fd2pragma
+	url = https://github.com/bebbo/fd2pragma
+[submodule "projects/fd2sfd"]
+	path = projects/fd2sfd
+	url = https://github.com/cahirwpz/fd2sfd
+[submodule "projects/gcc"]
+	path = projects/gcc
+	url = https://github.com/bebbo/gcc
+[submodule "projects/ira"]
+	path = projects/ira
+	url = https://github.com/bebbo/ira
+[submodule "projects/ixemul"]
+	path = projects/ixemul
+	url = https://github.com/bebbo/ixemul
+[submodule "projects/libdebug"]
+	path = projects/libdebug
+	url = https://github.com/bebbo/libdebug
+[submodule "projects/libnix"]
+	path = projects/libnix
+	url = https://github.com/bebbo/libnix
+[submodule "projects/libSDL12"]
+	path = projects/libSDL12
+	url = https://github.com/AmigaPorts/libSDL12
+[submodule "projects/newlib-cygwin"]
+	path = projects/newlib-cygwin
+	url = https://github.com/bebbo/newlib-cygwin
+[submodule "projects/sfdc"]
+	path = projects/sfdc
+	url = https://github.com/adtools/sfdc
+[submodule "projects/vasm"]
+	path = projects/vasm
+	url = https://github.com/leffmann/vasm
+[submodule "projects/vbcc"]
+	path = projects/vbcc
+	url = https://github.com/bebbo/vbcc
+[submodule "projects/vlink"]
+	path = projects/vlink
+	url = https://github.com/leffmann/vlink
+[submodule "projects/aros-stuff"]
+	path = projects/aros-stuff
+	url = https://github.com/bebbo/aros-stuff
+[submodule "projects/binutils"]
+	path = projects/binutils
+	url = https://github.com/bebbo/binutils-gdb
